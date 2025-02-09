@@ -55,61 +55,9 @@ table.insert(ctrls, {
 })
 
 table.insert(ctrls, {
-  Name = "Spkr 1",
-  ControlType = "Button",
-  ButtonType = "Toggle",
-  UserPin = true,
-  PinStyle = "Both",
-})
-table.insert(ctrls, {
-  Name = "Spkr 2",
-  ControlType = "Button",
-  ButtonType = "Toggle",
-  UserPin = true,
-  PinStyle = "Both",
-})
-table.insert(ctrls, {
-  Name = "Spkr 3",
-  ControlType = "Button",
-  ButtonType = "Toggle",
-  UserPin = true,
-  PinStyle = "Both",
-})
-
-table.insert(ctrls, {
-  Name = "Src A",
-  ControlType = "Button",
-  ButtonType = "Toggle",
-  UserPin = true,
-  PinStyle = "Both",
-})
-table.insert(ctrls, {
-  Name = "Src B",
-  ControlType = "Button",
-  ButtonType = "Toggle",
-  UserPin = true,
-  PinStyle = "Both",
-})
-table.insert(ctrls, {
-  Name = "Src C",
-  ControlType = "Button",
-  ButtonType = "Toggle",
-  UserPin = true,
-  PinStyle = "Both",
-})
-
-table.insert(ctrls, {
   Name = "External",
   ControlType = "Button",
   ButtonType = "Toggle",
-})
-
-table.insert(ctrls, {
-  Name = "Layer",
-  ControlType = "Button",
-  ButtonType = "StateTrigger",
-  Min = 0,
-  Max = 3
 })
 
 table.insert(ctrls, {
@@ -136,4 +84,41 @@ table.insert (ctrls, {
   ControlUnit = 'Integer',
   Min = 1,
   Max = 3
+})
+
+table.insert (ctrls, {
+  Name = 'SelectedSpeaker',
+  ControlType = 'Knob',
+  ControlUnit = 'Integer',
+  Min = 1,
+  Max = 12,
+  PinStyle = "Both",
+  UserPin = true
+})
+
+table.insert (ctrls, {
+  Name = 'SelectedSource',
+  ControlType = 'Knob',
+  ControlUnit = 'Integer',
+  Min = 1,
+  Max = 12,
+  PinStyle = "Both",
+  UserPin = true
+})
+
+table.insert(ctrls, {
+  Name = "Spkr",
+  ControlType = "Button",
+  ButtonType = "Toggle",
+  Count = 12,
+  UserPin = true,
+  PinStyle = "Output"
+})
+table.insert(ctrls, {
+  Name = "Src",
+  ControlType = "Button",
+  ButtonType = "Toggle",
+  Count = 12,
+  UserPin = true,
+  PinStyle = "Output"
 })

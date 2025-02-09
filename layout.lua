@@ -32,37 +32,19 @@ if CurrentPage == "Control" then
     Position = {254,39},
     Size = {32,32},
   }
-  layout['Spkr 1'] = {
+  layout['SelectedSpeaker'] = {
+    Style = 'ComboBox',
     Position = {26,123},
-    Size = {32,32},
+    Size = {180,32},
+    Color = {235,235,235},
+    FontSize = 14
   }
-  layout['Spkr 2'] = {
-    Position = {100,123},
-    Size = {32,32},
-  }
-  layout['Spkr 3'] = {
-    Position = {174,123},
-    Size = {32,32},
-  }
-  layout['Src A'] = {
+  layout['SelectedSource'] = {
+    Style = 'ComboBox',
     Position = {26,188},
-    Size = {32,32},
-  }
-  layout['Src B'] = {
-    Position = {100,188},
-    Size = {32,32},
-  }
-  layout['Src C'] = {
-    Position = {174,188},
-    Size = {32,32},
-  }
-  layout['Layer'] = {
-    Position = {174,57},
-    Size = {32,32},
-    UnlinkOffColor = true,
-    Color = {124,124,124},
-    OffColor = {124,124,124},
-    FontSize = 10
+    Size = {180,32},
+    Color = {255,255,255},
+    FontSize = 14
   }
 
 elseif CurrentPage == "Setup" then
@@ -176,9 +158,8 @@ elseif CurrentPage == "Setup" then
     })
     layout['LedIntensity'] = {
       Position = { 177,187 },
-      Style = "ComboBox",
+      Style = "Fader",
       Size = { 103, 20 },
-      Fill = { 255,255,255 }
     }
 
   table.insert(graphics, {
@@ -190,26 +171,41 @@ elseif CurrentPage == "Setup" then
     HTextAlign = "Left"
   })
 
+elseif CurrentPage == "Buttons" then
+  table.insert(graphics, {
+    Type = 'Header',
+    Text = "Spkr",
+    Position = { 15,14 },
+    Size = { 424,6 },
+    FontSize = 14,
+  })
+
+  table.insert(graphics, {
+    Type = 'Header',
+    Text = "Src",
+    Position = { 15,105 },
+    Size = { 424,6 },
+    FontSize = 14,
+  })
+
+  for i=1,12 do
+    layout["Spkr " .. i] = {
+      Style = "Button",
+      Position = { 11 + 36*(i-1), 31 },
+      Size = { 32,32 },
+      Legend = tostring(i),
+      FontSize = 14,
+      Margin = 0,
+      PrettyName = "Spkr~"..i
+    }
+    layout["Src " .. i] = {
+      Style = "Button",
+      Position = { 11 + 36*(i-1), 124 },
+      Size = { 32,32 },
+      Legend = tostring(i),
+      FontSize = 14,
+      Margin = 0,
+      PrettyName = "Src~"..i
+    }
+  end
 end
-
-
--- ## Extra Controls
--- Layer button
--- External switch
-
--- ## Messages
--- - Alive request
--- - Set aliveTime
--- - Restart device
--- - Clear settings
--- - Load application mode
--- - Identify device
--- - Get device information
--- - Get SW version
--- - Set master mode
--- - Set key mode
--- - Set key state
--- - Get key state
--- - Set ring LED state
--- - Set LED intensity
--- - Get rotary switch count

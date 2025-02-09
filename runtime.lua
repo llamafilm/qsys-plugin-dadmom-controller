@@ -38,6 +38,44 @@ function Send(msg)
   MOM:Write(msg .. '\r')
 end -- end Send
 
+function RectifySpeakerSelector()
+  -- set button and LED states to match the current layer
+  for i=1,3 do
+    print(Layer, i, Controls.SelectedSpeaker.Value)
+    if Controls.SelectedSpeaker.Value == Layer * 3 + i then
+      Send('&sledstate,' .. i .. ',1')
+    else
+      Send('&sledstate,' .. i .. ',0')
+    end
+  end
+
+  for i=1,12 do
+    if i == Controls.SelectedSpeaker.Value then
+      Controls['Spkr'][i].Value = 1
+    else
+      Controls['Spkr'][i].Value = 0
+    end
+  end
+end -- end RectifySpeakerSelector
+
+function RectifySourceSelector()
+  -- set button and LED states to match the current layer
+  for i=4,6 do
+    if Controls.SelectedSource.Value == Layer * 3 + i - 3 then
+      Send('&sledstate,' .. i .. ',1')
+    else
+      Send('&sledstate,' .. i .. ',0')
+    end
+  end
+  for i=1,12 do
+    if i == Controls.SelectedSource.Value then
+      Controls['Src'][i].Value = 1
+    else
+      Controls['Src'][i].Value = 0
+    end
+  end
+end -- end RectifySourceSelector
+
 function ProcessMessage(data)
   -- process messages from device
   if data == '?aliverequest' then
@@ -78,8 +116,7 @@ function ProcessMessage(data)
   elseif name == 'gkeystate' then
     local key = tonumber(params[1])
     local state = params[2]
-    if DebugFunction then print("Pressed key:", Keys[key]) end
-    Controls[Keys[key]].Value = state
+    if DebugFunction then print("Pressed key: " .. Keys[key] .. " state: " .. state) end
 
     if key == 12 then
       -- external switch not implemented
@@ -87,6 +124,12 @@ function ProcessMessage(data)
 
     elseif key == 11 then
       -- Layer
+      if Layer == 3 then
+        Layer = 0
+      else
+        Layer = Layer + 1
+      end
+
       for i=28,31 do
         if i == state + 28 then
           Send("&sringledstate," .. i .. ",1")
@@ -95,17 +138,32 @@ function ProcessMessage(data)
         end
       end
       print("Layer", state+1)
-      Controls.Layer.Legend = math.floor(state+1)
+      RectifySpeakerSelector()
+      RectifySourceSelector()
 
+    elseif key >= 1 and key <= 3 then
+      -- Spkr
+      if state == '1' then
+        Controls.SelectedSpeaker.Value = key + (Layer*3)
+        RectifySpeakerSelector()
+      end
+    elseif key >= 4 and key <= 6 then
+      -- Src
+      if state == '1' then
+        Controls.SelectedSource.Value = key - 3 + (Layer*3)
+        RectifySourceSelector()
+      end
     elseif key == 7 then
       -- Ref
       Controls.Level.Value = 0
+      Controls.Ref.Value = state
       Controls.Level.IsDisabled = Controls.Ref.Boolean
       HandleLevelChange(0)
       Send('%sledstate,' .. key .. ',' .. state)
 
     else
       Send('%sledstate,' .. key .. ',' .. state)
+      Controls[Keys[key]].Value = state
     end
 
   elseif name == 'grotcount' then
@@ -133,29 +191,39 @@ function ProcessMessage(data)
 
     -- restore previous key states after initializing key mode
     -- all keys are momentary/latch mode except layer
-    local key_states = {}
-    for key=1,10 do
-      table.insert(key_states, Controls[Keys[key]].Value)
+
+    -- selector keys are raw mode
+    for key=1,6 do
+      Send('&skeymode,' .. key .. ',1,0')
+    end
+
+    -- other keys are momentary/latch mode
+    for key=7,10 do
       Send('&skeymode,' .. key .. ',2,' .. math.floor(LatchTimeoutMilliseconds/100))
     end
     Send('&skeymode,11,3,4')
     print(Dump(key_states))
 
     -- initialize all button and LED states
-    for key=1,31 do
-      Send("&sringledstate," .. key .. ",0")
+    for led=1,27 do
+      Send("&sringledstate," .. led .. ",0")
     end
-    for idx, name in ipairs(Keys) do
-      if idx <= 10 then
-        Send('&skeystate,' .. idx .. ',' .. math.floor(Controls[name].Value))
-        Send('&sledstate,' .. idx .. ',' .. math.floor(Controls[name].Value))
+
+    for led=28,31 do
+      if led == Layer + 28 then
+        Send("&sringledstate," .. led .. ",1")
+      else
+        Send("&sringledstate," .. led .. ",0")
       end
     end
+
+
+    RectifySpeakerSelector()
+    RectifySourceSelector()
     HandleLevelChange(Controls.Level.Value)
 
     Send("%sledint," .. Controls['LedIntensity'].Value)
     Send('&skeystate,11,' .. math.floor(Controls.Layer.Value))
-
   end
 end -- end ProcessMessage
 
@@ -317,6 +385,7 @@ MOM.Timeout = function(MOM, err)
 end
 
 RotaryCount = 0
+Layer = 0
 LatchTimeoutMilliseconds = Properties['Button Latch Timeout'].Value:sub(1,-3)
 
 Keys = {
@@ -373,15 +442,18 @@ Controls.Level.EventHandler = function(ctl)
   HandleLevelChange(ctl.Value)
 end
 
--- create event handlers for each button
+-- create event handlers for each toggle button
 for idx, name in ipairs(Keys) do
-  if name ~= 'Layer' and name ~= 'External' and name ~= 'Ref' then
+  if idx >= 7 and idx <= 10 then
     Controls[name].EventHandler = function(ctl)
       Send('&sledstate,' .. idx .. ',' .. math.floor(ctl.Value))
       Send('&skeystate,' .. idx .. ',' .. math.floor(ctl.Value))
     end
   end
 end
+
+Controls.SelectedSpeaker.EventHandler = RectifySpeakerSelector
+Controls.SelectedSource.EventHandler = RectifySourceSelector
 
 Controls.Ref.EventHandler = function(ctl)
   Controls.Level.IsDisabled = ctl.Boolean
@@ -393,26 +465,15 @@ Controls.Ref.EventHandler = function(ctl)
   Send('&skeystate,7,' .. math.floor(ctl.Value))
 end
 
-Controls.Layer.EventHandler = function(ctl)
-  -- increment value 0-3
-  if ctl.Value == 3 then
-    ctl.Value = 0
-  else
-    ctl.Value = ctl.Value + 1
+for i=1,12 do
+  Controls['Spkr'][i].EventHandler = function(ctl)
+    Controls.SelectedSpeaker.Value = ctl.Index - 16
+    RectifySpeakerSelector()
   end
-  print("Layer", ctl.Value + 1)
-  Send('&skeystate,11,' .. math.floor(ctl.Value))
-
-  -- update LEDs
-  for i=28,31 do
-    if i == ctl.Value + 28 then
-      Send("&sringledstate," .. i .. ",1")
-    else
-      Send("&sringledstate," .. i .. ",0")
-    end
+  Controls['Src'][i].EventHandler = function(ctl)
+    Controls.SelectedSource.Value = ctl.Index - 28
+    RectifySourceSelector()
   end
-
-  ctl.Legend = math.floor(ctl.Value+1)
 end
 
 Connect()
