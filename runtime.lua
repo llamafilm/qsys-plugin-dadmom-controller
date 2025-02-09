@@ -344,52 +344,50 @@ end
 
 MOM = TcpSocket.New()
 MOM.ReadTimeout = 11
+MOM.EventHandler = function(sock, evt, err)
+  if evt == TcpSocket.Events.Connected then
+    print("TCP socket is connected")
+    Controls.Status.Value = 0 -- OK
+    -- Send("?ghwconf,2")
+    Send('&smaster,1')
+    Send('?gdevinfo')
+    Send('?gswver,2')
 
-MOM.Connected = function(MOM)
-  print("TCP socket is connected")
-  Controls.Status.Value = 0 -- OK
-  -- Send("?ghwconf,2")
-  Send('&smaster,1')
-  Send('?gdevinfo')
-  Send('?gswver,2')
+    AliveTimer = Timer.New()
+    AliveTimer.EventHandler = function()
+      Send('?aliverequest')
+    end
+    AliveTimer:Start(10)
 
-  AliveTimer = Timer.New()
-  AliveTimer.EventHandler = function()
-    Send('?aliverequest')
+  elseif evt == TcpSocket.Events.Reconnect then
+    print("TCP socket is reconnecting")
+    Controls.Status.Value = 5 -- initializing
+
+  elseif evt == TcpSocket.Events.Data then
+    local message = MOM:ReadLine(TcpSocket.EOL.Any)
+    while (message ~= nil) do
+      if DebugRx then print("Rx: " .. message ) end
+      ProcessMessage(message)
+      message = MOM:ReadLine(TcpSocket.EOL.Any)
+    end
+
+  elseif evt == TcpSocket.Events.Closed then
+    print("TCP socket was closed by the remote end")
+    Controls.Status.Value = 2 -- fault
+    Controls.Status.String = "socket closed"
+    AliveTimer:Stop()
+
+  elseif evt == TcpSocket.Events.Error then
+    print("TCP socket had an error:", err)
+    Controls.Status.Value = 2 -- fault
+    Controls.Status.String = err
+
+  elseif evt == TcpSocket.Events.Timeout then
+    print("TCP socket timed out", err)
+    Controls.Status.Value = 2 -- fault
+    Controls.Status.String = "socket timeout"
+    AliveTimer:Stop()
   end
-  AliveTimer:Start(10)
-end
-
-MOM.Reconnect = function(MOM)
-  print("TCP socket is reconnecting")
-  Controls.Status.Value = 5 -- initializing
-end
-
-MOM.Data = function(MOM)
-  local message = MOM:ReadLine(TcpSocket.EOL.Any)
-  while (message ~= nil) do
-    if DebugRx then print("Rx: " .. message ) end
-    ProcessMessage(message)
-    message = MOM:ReadLine(TcpSocket.EOL.Any)
-  end
-end
-
-MOM.Closed = function(MOM)
-  print("TCP socket was closed by the remote end")
-  Controls.Status.Value = 2 -- fault
-  Controls.Status.String = "socket closed"
-end
-
-MOM.Error = function(MOM, err)
-  print("TCP socket had an error:", err)
-  Controls.Status.Value = 2 -- fault
-  Controls.Status.String = err
-end
-
-MOM.Timeout = function(MOM, err)
-  print("TCP socket timed out", err)
-  Controls.Status.Value = 2 -- fault
-  Controls.Status.String = "socket timeout"
 end
 
 RotaryCount = 0
@@ -471,13 +469,14 @@ Controls.Ref.EventHandler = function(ctl)
   Send('&sledstate,7,' .. math.floor(ctl.Value))
 end
 
+-- when code Control is present, the Index gets pushed
 for i=1,12 do
   Controls['Spkr'][i].EventHandler = function(ctl)
-    Controls.SelectedSpeaker.Value = ctl.Index - 16
+    Controls.SelectedSpeaker.Value = ctl.Index - 15 + (PluginInfo["ShowDebug"] and 1 or 0)
     RectifySpeakerSelector()
   end
   Controls['Src'][i].EventHandler = function(ctl)
-    Controls.SelectedSource.Value = ctl.Index - 28
+    Controls.SelectedSource.Value = ctl.Index - 27 + (PluginInfo["ShowDebug"] and 1 or 0)
     RectifySourceSelector()
   end
 end
