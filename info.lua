@@ -1,8 +1,8 @@
 PluginInfo = {
-  Name = "Base Plugin",
-  Version = "0.0",
-  BuildVersion = "0.0.0.0",
-  Id = "<guid>",
-  Author = "Your_Company",
-  Description = "A very basic plugin"  
+  Name = "DadMom Controller",
+  Version = "0.1",
+  BuildVersion = "0.1.0.22",
+  Id = "15f3d80e-f9ab-4ffb-9e47-f926fe41ecde",
+  Author = "Elliott Balsley",
+  Description = "Plugin for the DadMom volume controller"
 }
