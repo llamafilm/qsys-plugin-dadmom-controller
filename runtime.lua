@@ -41,7 +41,6 @@ end -- end Send
 function RectifySpeakerSelector()
   -- set button and LED states to match the current layer
   for i=1,3 do
-    print(Layer, i, Controls.SelectedSpeaker.Value)
     if Controls.SelectedSpeaker.Value == Layer * 3 + i then
       Send('&sledstate,' .. i .. ',1')
     else
@@ -122,48 +121,54 @@ function ProcessMessage(data)
       -- external switch not implemented
       return
 
-    elseif key == 11 then
-      -- Layer
-      if Layer == 3 then
-        Layer = 0
-      else
-        Layer = Layer + 1
-      end
-
-      for i=28,31 do
-        if i == state + 28 then
-          Send("&sringledstate," .. i .. ",1")
-        else
-          Send("&sringledstate," .. i .. ",0")
-        end
-      end
-      print("Layer", state+1)
-      RectifySpeakerSelector()
-      RectifySourceSelector()
-
-    elseif key >= 1 and key <= 3 then
-      -- Spkr
-      if state == '1' then
-        Controls.SelectedSpeaker.Value = key + (Layer*3)
-        RectifySpeakerSelector()
-      end
-    elseif key >= 4 and key <= 6 then
-      -- Src
-      if state == '1' then
-        Controls.SelectedSource.Value = key - 3 + (Layer*3)
-        RectifySourceSelector()
-      end
-    elseif key == 7 then
-      -- Ref
-      Controls.Level.Value = 0
-      Controls.Ref.Value = state
-      Controls.Level.IsDisabled = Controls.Ref.Boolean
-      HandleLevelChange(0)
-      Send('%sledstate,' .. key .. ',' .. state)
-
-    else
+    elseif key == 9 then
+      -- TB latching/momentary
       Send('%sledstate,' .. key .. ',' .. state)
       Controls[Keys[key]].Value = state
+
+    -- ignore key up events for raw keys
+    elseif state == '1' then
+      if key >= 1 and key <= 3 then
+        -- Spkr
+        Controls.SelectedSpeaker.Value = key + Layer*3
+        RectifySpeakerSelector()
+
+      elseif key >= 4 and key <= 6 then
+        -- Src
+        Controls.SelectedSource.Value = key - 3 + Layer*3
+        RectifySourceSelector()
+
+      elseif key == 7 then
+        -- Ref
+        Controls.Level.Value = 0
+        Controls.Ref.Value = (Controls.Ref.Value == 0) and 1 or 0
+        Controls.Level.IsDisabled = Controls.Ref.Boolean
+        HandleLevelChange(0)
+        Send('%sledstate,' .. key .. ',' .. Controls.Ref.Value)
+
+      elseif key == 8 or key == 10 then
+        Controls[Keys[key]].Value = (Controls[Keys[key]].Value == 0) and 1 or 0
+        Send('%sledstate,' .. key .. ',' .. math.floor(Controls[Keys[key]].Value))
+
+      elseif key == 11 then
+        -- Layer
+        if Layer == 3 then
+          Layer = 0
+        else
+          Layer = Layer + 1
+        end
+
+        for i=0,3 do
+          if i == Layer then
+            Send("&sringledstate," .. i+28 .. ",1")
+          else
+            Send("&sringledstate," .. i+28 .. ",0")
+          end
+        end
+        if DebugFunction then print("Switched to layer", Layer+1) end
+        RectifySpeakerSelector()
+        RectifySourceSelector()
+      end
     end
 
   elseif name == 'grotcount' then
@@ -173,10 +178,8 @@ function ProcessMessage(data)
     -- Handle 16-bit rotary encoder wrap around
     if difference > 32000 then
       difference = difference - 65535 - 1
-      print("New difference:", difference)
     elseif difference < -32000 then
       difference = difference + 65535 + 1
-      print("New difference:", difference)
     end
 
     local change = 0.5 * difference
@@ -189,20 +192,16 @@ function ProcessMessage(data)
     --Send('&sclear')
     --Send('&salivetime,300')
 
-    -- restore previous key states after initializing key mode
-    -- all keys are momentary/latch mode except layer
-
-    -- selector keys are raw mode
-    for key=1,6 do
+    -- all keys are raw mode except TB
+    for key=1,8 do
       Send('&skeymode,' .. key .. ',1,0')
+      Send('&sledstate,' .. key .. ',1,0')
     end
+    Send('&skeymode,10,1,0')
+    Send('&skeymode,11,1,0')
 
-    -- other keys are momentary/latch mode
-    for key=7,10 do
-      Send('&skeymode,' .. key .. ',2,' .. math.floor(LatchTimeoutMilliseconds/100))
-    end
-    Send('&skeymode,11,3,4')
-    print(Dump(key_states))
+    -- TB key is momentary/latch mode
+    Send('&skeymode,9,2,' .. math.floor(LatchTimeoutMilliseconds/100))
 
     -- initialize all button and LED states
     for led=1,27 do
@@ -218,12 +217,17 @@ function ProcessMessage(data)
     end
 
 
+    Send('&sledstate,7,' .. math.floor(Controls.Ref.Value))
+    Send('&sledstate,8,' .. math.floor(Controls.Dim.Value))
+    Send('&sledstate,9,' .. math.floor(Controls.TB.Value))
+    Send('&sledstate,10,' .. math.floor(Controls.Cut.Value))
+    Send('&sledstate,11,0')
+
     RectifySpeakerSelector()
     RectifySourceSelector()
     HandleLevelChange(Controls.Level.Value)
 
     Send("%sledint," .. Controls['LedIntensity'].Value)
-    Send('&skeystate,11,' .. math.floor(Controls.Layer.Value))
   end
 end -- end ProcessMessage
 
@@ -386,7 +390,7 @@ end
 
 RotaryCount = 0
 Layer = 0
-LatchTimeoutMilliseconds = Properties['Button Latch Timeout'].Value:sub(1,-3)
+LatchTimeoutMilliseconds = Properties['TB Latch Time'].Value:sub(1,-3)
 
 Keys = {
   'Spkr 1', -- 1
@@ -447,7 +451,6 @@ for idx, name in ipairs(Keys) do
   if idx >= 7 and idx <= 10 then
     Controls[name].EventHandler = function(ctl)
       Send('&sledstate,' .. idx .. ',' .. math.floor(ctl.Value))
-      Send('&skeystate,' .. idx .. ',' .. math.floor(ctl.Value))
     end
   end
 end
@@ -462,16 +465,15 @@ Controls.Ref.EventHandler = function(ctl)
     HandleLevelChange(0)
   end
   Send('&sledstate,7,' .. math.floor(ctl.Value))
-  Send('&skeystate,7,' .. math.floor(ctl.Value))
 end
 
 for i=1,12 do
   Controls['Spkr'][i].EventHandler = function(ctl)
-    Controls.SelectedSpeaker.Value = ctl.Index - 15
+    Controls.SelectedSpeaker.Value = ctl.Index - 16
     RectifySpeakerSelector()
   end
   Controls['Src'][i].EventHandler = function(ctl)
-    Controls.SelectedSource.Value = ctl.Index - 27
+    Controls.SelectedSource.Value = ctl.Index - 28
     RectifySourceSelector()
   end
 end

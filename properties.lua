@@ -5,7 +5,7 @@ table.insert(props, {
   Value = "None"
 })
 table.insert(props, {
-  Name = "Button Latch Timeout",
+  Name = "TB Latch Time",
   Type = "enum",
   Choices = {
     "100ms",
