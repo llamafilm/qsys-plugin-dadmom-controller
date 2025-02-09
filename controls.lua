@@ -50,7 +50,8 @@ table.insert(ctrls, {
   Name = "Ref",
   ControlType = "Button",
   ButtonType = "Toggle",
-  PinStyle = "None",
+  UserPin = true,
+  PinStyle = "Both"
 })
 
 table.insert(ctrls, {
