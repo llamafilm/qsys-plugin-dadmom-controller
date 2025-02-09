@@ -1,6 +1,3 @@
--- -- debug mode
--- table.insert(ctrls,{Name = 'code',ControlType = 'Text',UserPin = false,PinStyle = 'Input'})
-
 table.insert (ctrls, {
   Name = 'IPAddress',
   ControlType = 'Text',

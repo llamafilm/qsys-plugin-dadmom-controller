@@ -1,6 +1,3 @@
--- -- debug mode
--- layout['code']={PrettyName='code',Style='None'}
-
 local DadMomPhoto = "--[[ #encode "dadmom.jpg" ]]"
 
 local CurrentPage = PageNames[props["page_index"].Value]

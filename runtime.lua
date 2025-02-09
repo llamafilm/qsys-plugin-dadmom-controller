@@ -467,11 +467,11 @@ end
 
 for i=1,12 do
   Controls['Spkr'][i].EventHandler = function(ctl)
-    Controls.SelectedSpeaker.Value = ctl.Index - 16
+    Controls.SelectedSpeaker.Value = ctl.Index - 15
     RectifySpeakerSelector()
   end
   Controls['Src'][i].EventHandler = function(ctl)
-    Controls.SelectedSource.Value = ctl.Index - 28
+    Controls.SelectedSource.Value = ctl.Index - 27
     RectifySourceSelector()
   end
 end

@@ -68,6 +68,13 @@ end
 function GetControls(props)
   local ctrls = {}
   --[[ #include "controls.lua" ]]
+  if PluginInfo["ShowDebug"] then
+		table.insert(ctrls, {
+			Name = "code",
+			ControlType = "Text",
+			PinStyle = "Input"
+		})
+	end
   return ctrls
 end
 
@@ -76,10 +83,16 @@ function GetControlLayout(props)
   local layout = {}
   local graphics = {}
   --[[ #include "layout.lua" ]]
+	if PluginInfo["ShowDebug"] then
+		layout["code"] = {
+			Style = "None",
+			PrettyName = "Code",
+		}
+	end
   return layout, graphics
 end
 
 --Start event based logic
-if Controls then
+if Controls and not PluginInfo["ShowDebug"] then
   --[[ #include "runtime.lua" ]]
 end
