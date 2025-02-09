@@ -103,7 +103,8 @@ elseif CurrentPage == "Setup" then
   })
   layout['Status'] = {
     Position = { 84,64 },
-    Size = { 201, 20 }
+    Size = { 201, 20 },
+    PrettyName = "Status~Status"
   }
 
   table.insert(graphics, {
@@ -114,57 +115,60 @@ elseif CurrentPage == "Setup" then
     FontSize = 14,
   })
 
-    table.insert(graphics,{
-      Type = "Label",
-      Text = "Model",
-      Position = { 25,124 },
-      Size = { 103,16 },
-      FontSize = 10,
-    })
-    layout['DeviceModel'] = {
-      Position = { 25,140 },
-      Size = { 103, 20 },
-      IsReadOnly = true
-    }
+  table.insert(graphics,{
+    Type = "Label",
+    Text = "Model",
+    Position = { 25,124 },
+    Size = { 103,16 },
+    FontSize = 10,
+  })
+  layout['DeviceModel'] = {
+    Position = { 25,140 },
+    Size = { 103, 20 },
+    IsReadOnly = true,
+    PrettyName = "Status~Device Model"
+  }
 
-    table.insert(graphics,{
-      Type = "Label",
-      Text = "Software Version",
-      Position = { 177,124 },
-      Size = { 103,16 },
-      FontSize = 10,
-    })
-    layout['DeviceFirmware'] = {
-      Position = { 177,140 },
-      Size = { 103, 20 },
-      IsReadOnly = true
-    }
+  table.insert(graphics,{
+    Type = "Label",
+    Text = "Software Version",
+    Position = { 177,124 },
+    Size = { 103,16 },
+    FontSize = 10,
+  })
+  layout['DeviceFirmware'] = {
+    Position = { 177,140 },
+    Size = { 103, 20 },
+    IsReadOnly = true,
+    PrettyName = "Status~Device Firmware"
+  }
 
-    table.insert(graphics,{
-      Type = "Label",
-      Text = "Serial Number",
-      Position = { 25,171 },
-      Size = { 103,16 },
-      FontSize = 10,
-    })
-    layout['SerialNumber'] = {
-      Position = { 25,187 },
-      Size = { 103, 20 },
-      IsReadOnly = true
-    }
+  table.insert(graphics,{
+    Type = "Label",
+    Text = "Serial Number",
+    Position = { 25,171 },
+    Size = { 103,16 },
+    FontSize = 10
+  })
+  layout['SerialNumber'] = {
+    Position = { 25,187 },
+    Size = { 103, 20 },
+    IsReadOnly = true,
+    PrettyName = "Status~Serial Number"
+  }
 
-    table.insert(graphics,{
-      Type = "Label",
-      Text = "LED Intensity",
-      Position = { 177,171 },
-      Size = { 103,16 },
-      FontSize = 10
-    })
-    layout['LedIntensity'] = {
-      Position = { 177,187 },
-      Style = "Fader",
-      Size = { 103, 20 },
-    }
+  table.insert(graphics,{
+    Type = "Label",
+    Text = "LED Intensity",
+    Position = { 177,171 },
+    Size = { 103,16 },
+    FontSize = 10
+  })
+  layout['LedIntensity'] = {
+    Position = { 177,187 },
+    Style = "Fader",
+    Size = { 103, 20 },
+  }
 
   table.insert(graphics, {
     Type = 'Label',

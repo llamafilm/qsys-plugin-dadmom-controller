@@ -74,14 +74,20 @@ table.insert(ctrls, {
 table.insert (ctrls, {
   Name = 'SerialNumber',
   ControlType = 'Text',
+  PinStyle = "Output",
+  UserPin = true,
 })
 table.insert (ctrls, {
   Name = 'DeviceFirmware',
   ControlType = 'Text',
+  PinStyle = "Output",
+  UserPin = true
 })
 table.insert (ctrls, {
   Name = 'DeviceModel',
   ControlType = 'Text',
+  PinStyle = "Output",
+  UserPin = true
 })
 table.insert (ctrls, {
   Name = 'LedIntensity',
