@@ -343,9 +343,7 @@ elseif DebugPrint == 'All' then
 end
 
 MOM = TcpSocket.New()
-MOM.ReadTimeout = 0
-MOM.WriteTimeout = 0
-MOM.ReconnectTimeout = 5
+MOM.ReadTimeout = 11
 
 MOM.Connected = function(MOM)
   print("TCP socket is connected")
@@ -354,6 +352,12 @@ MOM.Connected = function(MOM)
   Send('&smaster,1')
   Send('?gdevinfo')
   Send('?gswver,2')
+
+  AliveTimer = Timer.New()
+  AliveTimer.EventHandler = function()
+    Send('?aliverequest')
+  end
+  AliveTimer:Start(10)
 end
 
 MOM.Reconnect = function(MOM)
