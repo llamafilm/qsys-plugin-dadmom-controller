@@ -175,7 +175,7 @@ elseif CurrentPage == "Setup" then
     Text = "Version " ..PluginInfo.BuildVersion,
     Position = { 0,210 },
     Size = { 67,20 },
-    FontSize = 8,
+    FontSize = 9,
     HTextAlign = "Left"
   })
 

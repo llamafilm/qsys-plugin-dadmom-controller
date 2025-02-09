@@ -352,11 +352,6 @@ MOM.EventHandler = function(sock, evt, err)
     Send('&smaster,1')
     Send('?gdevinfo')
     Send('?gswver,2')
-
-    AliveTimer = Timer.New()
-    AliveTimer.EventHandler = function()
-      Send('?aliverequest')
-    end
     AliveTimer:Start(10)
 
   elseif evt == TcpSocket.Events.Reconnect then
@@ -393,6 +388,11 @@ end
 RotaryCount = 0
 Layer = 0
 LatchTimeoutMilliseconds = Properties['TB Latch Time'].Value:sub(1,-3)
+
+AliveTimer = Timer.New()
+AliveTimer.EventHandler = function()
+  Send('?aliverequest')
+end
 
 Keys = {
   'Spkr 1', -- 1
