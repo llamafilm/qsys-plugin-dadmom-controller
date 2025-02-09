@@ -1,3 +1,11 @@
+if PluginInfo["ShowDebug"] then
+  table.insert(ctrls, {
+    Name = "code",
+    ControlType = "Text",
+    PinStyle = "Input"
+  })
+end
+
 table.insert (ctrls, {
   Name = 'IPAddress',
   ControlType = 'Text',

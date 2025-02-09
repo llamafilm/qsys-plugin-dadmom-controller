@@ -1,3 +1,10 @@
+if PluginInfo["ShowDebug"] then
+  layout["code"] = {
+    Style = "None",
+    PrettyName = "Code",
+  }
+end
+
 local DadMomPhoto = "--[[ #encode "dadmom.jpg" ]]"
 
 local CurrentPage = PageNames[props["page_index"].Value]
