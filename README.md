@@ -16,4 +16,8 @@ The Identify button on the Setup page will light up all LEDs green for 10 second
 
 This was tested using Q-Sys 9.12.1 and DadMom firmware 1.0.1.4.
 
+### Example design wiring
+![QDS example](https://github.com/user-attachments/assets/050656a1-e55f-427c-ab76-9e28a4e963f7)
+
+
 Plugin is based on the [BasicPluginFramework](https://bitbucket.org/qsc-communities/basicpluginframework/src/main/) from QSC and includes the VS Code submodule for easy compiling.
