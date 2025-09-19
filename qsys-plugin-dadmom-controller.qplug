@@ -6,7 +6,7 @@
 PluginInfo = {
   Name = "DadMom Controller",
   Version = "0.3",
-  BuildVersion = "0.3.1.1",
+  BuildVersion = "0.3.2.0",
   Id = "15f3d80e-f9ab-4ffb-9e47-f926fe41ecde",
   Author = "Elliott Balsley",
   Description = "Plugin for the DadMom volume controller",
@@ -476,14 +476,6 @@ if Controls and not PluginInfo["ShowDebug"] then
   
   function RectifySpeakerSelector()
     -- set button and LED states to match the current layer
-    for i=1,3 do
-      if Controls.SelectedSpeaker.Value == Layer * 3 + i then
-        Send('&sledstate,' .. i .. ',1')
-      else
-        Send('&sledstate,' .. i .. ',0')
-      end
-    end
-  
     for i=1,12 do
       if i == Controls.SelectedSpeaker.Value then
         Controls['Spkr'][i].Value = 1
@@ -491,22 +483,31 @@ if Controls and not PluginInfo["ShowDebug"] then
         Controls['Spkr'][i].Value = 0
       end
     end
-  end -- end RectifySpeakerSelector
   
-  function RectifySourceSelector()
-    -- set button and LED states to match the current layer
-    for i=4,6 do
-      if Controls.SelectedSource.Value == Layer * 3 + i - 3 then
+    for i=1,3 do
+      if Controls.SelectedSpeaker.Value == Layer * 3 + i then
         Send('&sledstate,' .. i .. ',1')
       else
         Send('&sledstate,' .. i .. ',0')
       end
     end
+  end -- end RectifySpeakerSelector
+  
+  function RectifySourceSelector()
+    -- set button and LED states to match the current layer
     for i=1,12 do
       if i == Controls.SelectedSource.Value then
         Controls['Src'][i].Value = 1
       else
         Controls['Src'][i].Value = 0
+      end
+    end
+  
+    for i=4,6 do
+      if Controls.SelectedSource.Value == Layer * 3 + i - 3 then
+        Send('&sledstate,' .. i .. ',1')
+      else
+        Send('&sledstate,' .. i .. ',0')
       end
     end
   end -- end RectifySourceSelector

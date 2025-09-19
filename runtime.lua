@@ -40,14 +40,6 @@ end -- end Send
 
 function RectifySpeakerSelector()
   -- set button and LED states to match the current layer
-  for i=1,3 do
-    if Controls.SelectedSpeaker.Value == Layer * 3 + i then
-      Send('&sledstate,' .. i .. ',1')
-    else
-      Send('&sledstate,' .. i .. ',0')
-    end
-  end
-
   for i=1,12 do
     if i == Controls.SelectedSpeaker.Value then
       Controls['Spkr'][i].Value = 1
@@ -55,22 +47,31 @@ function RectifySpeakerSelector()
       Controls['Spkr'][i].Value = 0
     end
   end
-end -- end RectifySpeakerSelector
 
-function RectifySourceSelector()
-  -- set button and LED states to match the current layer
-  for i=4,6 do
-    if Controls.SelectedSource.Value == Layer * 3 + i - 3 then
+  for i=1,3 do
+    if Controls.SelectedSpeaker.Value == Layer * 3 + i then
       Send('&sledstate,' .. i .. ',1')
     else
       Send('&sledstate,' .. i .. ',0')
     end
   end
+end -- end RectifySpeakerSelector
+
+function RectifySourceSelector()
+  -- set button and LED states to match the current layer
   for i=1,12 do
     if i == Controls.SelectedSource.Value then
       Controls['Src'][i].Value = 1
     else
       Controls['Src'][i].Value = 0
+    end
+  end
+
+  for i=4,6 do
+    if Controls.SelectedSource.Value == Layer * 3 + i - 3 then
+      Send('&sledstate,' .. i .. ',1')
+    else
+      Send('&sledstate,' .. i .. ',0')
     end
   end
 end -- end RectifySourceSelector
