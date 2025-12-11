@@ -233,8 +233,10 @@ function HandleLevelChange(level_db)
   -- State 0=off, 1=green, 2=red, 3=orange
   -- Each LED represents 2 dB
 
-  if Controls.Ref.Boolean then
+  if Properties["Ref Lock"].Value == "On" and Controls.Ref.Boolean then
     level_db = 0
+  elseif Controls.Level.Value ~= 0 then
+    Controls.Ref.Boolean = False
   end
 
   Controls.Level.Value = level_db
@@ -464,7 +466,9 @@ Controls.SelectedSpeaker.EventHandler = RectifySpeakerSelector
 Controls.SelectedSource.EventHandler = RectifySourceSelector
 
 Controls.Ref.EventHandler = function(ctl)
-  Controls.Level.IsDisabled = ctl.Boolean
+  if Properties["Ref Lock"].Value == "On" then
+    Controls.Level.IsDisabled = ctl.Boolean
+  end
   if ctl.Boolean then
     Controls.Level.Value = 0
     HandleLevelChange(0)

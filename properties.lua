@@ -5,6 +5,15 @@ table.insert(props, {
   Value = "None"
 })
 table.insert(props, {
+  Name = "Ref Lock",
+  Type = "enum",
+  Choices = {
+    "Off",
+    "On"
+  },
+  Value = "On"
+})
+table.insert(props, {
   Name = "TB Latch Time",
   Type = "enum",
   Choices = {
