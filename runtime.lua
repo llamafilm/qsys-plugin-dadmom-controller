@@ -116,43 +116,39 @@ function ProcessMessage(data)
   elseif name == 'gkeystate' then
     local key = tonumber(params[1])
     local state = params[2]
-    if DebugFunction then print("Pressed key: " .. Keys[key] .. " state: " .. state) end
+    if DebugFunction then print("Pressed key: " .. KeyNames[key] .. " state: " .. state) end
 
-    if key == 12 then
+    if key == Keys.EXTERNAL then
       -- external switch not implemented
       return
 
-    elseif key == 9 then
+    elseif key == Keys.TB then
       -- TB latching/momentary
       Send('%sledstate,' .. key .. ',' .. state)
-      Controls[Keys[key]].Value = state
+      Controls.TB.Value = state
 
     -- ignore key up events for raw keys
     elseif state == '1' then
-      if key >= 1 and key <= 3 then
-        -- Spkr
+      if key == Keys.SPKR_1 or key ==  Keys.SPKR_2 or key == Keys.SPKR_3 then
         Controls.SelectedSpeaker.Value = key + Layer*3
         RectifySpeakerSelector()
 
-      elseif key >= 4 and key <= 6 then
-        -- Src
+      elseif key == Keys.SRC_A or key == Keys.SRC_B or key == Keys.SRC_C then
         Controls.SelectedSource.Value = key - 3 + Layer*3
         RectifySourceSelector()
 
-      elseif key == 7 then
-        -- Ref
+      elseif key == Keys.REF then
         Controls.Level.Value = 0
         Controls.Ref.Value = (Controls.Ref.Value == 0) and 1 or 0
         Controls.Level.IsDisabled = Controls.Ref.Boolean
         HandleLevelChange(0)
         Send('%sledstate,' .. key .. ',' .. Controls.Ref.Value)
 
-      elseif key == 8 or key == 10 then
+      elseif key == Keys.DIM or key == Keys.CUT then
         Controls[Keys[key]].Value = (Controls[Keys[key]].Value == 0) and 1 or 0
         Send('%sledstate,' .. key .. ',' .. math.floor(Controls[Keys[key]].Value))
 
-      elseif key == 11 then
-        -- Layer
+      elseif key == Keys.LAYER then
         if Layer == 3 then
           Layer = 0
         else
@@ -396,19 +392,25 @@ AliveTimer.EventHandler = function()
 end
 
 Keys = {
-  'Spkr 1', -- 1
-  'Spkr 2', -- 2
-  'Spkr 3', -- 3
-  'Src A',  -- 4
-  'Src B',  -- 5
-  'Src C',  -- 6
-  'Ref',    -- 7
-  'Dim',    -- 8
-  'TB',     -- 9
-  'Cut',    -- 10
-  'Layer',  -- 11
-  'External'-- 12
+  SPKR_1 = 1,
+  SPKR_2 = 2,
+  SPKR_3 = 3,
+  SRC_A = 4,
+  SRC_B = 5,
+  SRC_C = 6,
+  REF = 7,
+  DIM = 8,
+  TB = 9,
+  CUT = 10,
+  LAYER = 11,
+  EXTERNAL = 12,
 }
+
+-- Build reverse lookup for debug output
+KeyNames = {}
+for name, num in pairs(Keys) do
+  KeyNames[num] = name
+end
 
 RingLedState = {}
 for i = 1, 27 do
