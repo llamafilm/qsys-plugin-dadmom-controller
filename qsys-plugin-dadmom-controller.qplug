@@ -6,7 +6,7 @@
 PluginInfo = {
   Name = "DadMom Controller",
   Version = "0.4",
-  BuildVersion = "0.4.0.0",
+  BuildVersion = "0.4.1.0",
   Id = "15f3d80e-f9ab-4ffb-9e47-f926fe41ecde",
   Author = "Elliott Balsley",
   Description = "Plugin for the DadMom volume controller",
@@ -589,9 +589,13 @@ if Controls and not PluginInfo["ShowDebug"] then
           HandleLevelChange(0)
           Send('%sledstate,' .. key .. ',' .. Controls.Ref.Value)
 
-        elseif key == Keys.DIM or key == Keys.CUT then
-          Controls[Keys[key]].Value = (Controls[Keys[key]].Value == 0) and 1 or 0
-          Send('%sledstate,' .. key .. ',' .. math.floor(Controls[Keys[key]].Value))
+        elseif key == Keys.DIM then
+          Controls.Dim.Value = (Controls.Dim.Value == 0) and 1 or 0
+          Send('%sledstate,' .. key .. ',' .. math.floor(Controls.Dim.Value))
+
+        elseif key == Keys.CUT then
+          Controls.Cut.Value = (Controls.Cut.Value == 0) and 1 or 0
+          Send('%sledstate,' .. key .. ',' .. math.floor(Controls.Cut.Value))
 
         elseif key == Keys.LAYER then
           if Layer == 3 then
