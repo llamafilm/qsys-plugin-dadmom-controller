@@ -144,9 +144,13 @@ function ProcessMessage(data)
         HandleLevelChange(0)
         Send('%sledstate,' .. key .. ',' .. Controls.Ref.Value)
 
-      elseif key == Keys.DIM or key == Keys.CUT then
-        Controls[Keys[key]].Value = (Controls[Keys[key]].Value == 0) and 1 or 0
-        Send('%sledstate,' .. key .. ',' .. math.floor(Controls[Keys[key]].Value))
+      elseif key == Keys.DIM then
+        Controls.Dim.Value = (Controls.Dim.Value == 0) and 1 or 0
+        Send('%sledstate,' .. key .. ',' .. math.floor(Controls.Dim.Value))
+
+      elseif key == Keys.CUT then
+        Controls.Cut.Value = (Controls.Cut.Value == 0) and 1 or 0
+        Send('%sledstate,' .. key .. ',' .. math.floor(Controls.Cut.Value))
 
       elseif key == Keys.LAYER then
         if Layer == 3 then
