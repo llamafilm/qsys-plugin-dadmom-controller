@@ -457,13 +457,16 @@ Controls.Level.EventHandler = function(ctl)
   HandleLevelChange(ctl.Value)
 end
 
--- create event handlers for each toggle button
-for idx, name in ipairs(Keys) do
-  if idx >= 7 and idx <= 10 then
-    Controls[name].EventHandler = function(ctl)
-      Send('&sledstate,' .. idx .. ',' .. math.floor(ctl.Value))
-    end
-  end
+Controls.Cut.EventHandler = function(ctl)
+  Send('&sledstate,' .. Keys.CUT .. ',' .. math.floor(ctl.Value))
+end
+
+Controls.Dim.EventHandler = function(ctl)
+  Send('&sledstate,' .. Keys.DIM .. ',' .. math.floor(ctl.Value))
+end
+
+Controls.TB.EventHandler = function(ctl)
+  Send('&sledstate,' .. Keys.TB .. ',' .. math.floor(ctl.Value))
 end
 
 Controls.SelectedSpeaker.EventHandler = RectifySpeakerSelector
