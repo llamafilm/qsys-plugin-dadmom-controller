@@ -138,11 +138,15 @@ function ProcessMessage(data)
         RectifySourceSelector()
 
       elseif key == Keys.REF then
-        Controls.Level.Value = 0
-        Controls.Ref.Value = (Controls.Ref.Value == 0) and 1 or 0
-        Controls.Level.IsDisabled = Controls.Ref.Boolean
+        if Properties["Ref Mode"].Value == "Lock" then
+          -- Enable or disable level control
+          Controls.Ref.Value = 1 - Controls.Ref.Value
+          Controls.Level.IsDisabled = Controls.Ref.Boolean
+        end
+
+        -- Set level to 0 and update LED
         HandleLevelChange(0)
-        Send('%sledstate,' .. key .. ',' .. Controls.Ref.Value)
+        Send('%sledstate,' .. key .. ',' .. math.floor(Controls.Ref.Value))
 
       elseif key == Keys.DIM then
         Controls.Dim.Value = (Controls.Dim.Value == 0) and 1 or 0
@@ -237,10 +241,15 @@ function HandleLevelChange(level_db)
   -- State 0=off, 1=green, 2=red, 3=orange
   -- Each LED represents 2 dB
 
-  if Properties["Ref Lock"].Value == "On" and Controls.Ref.Boolean then
-    level_db = 0
-  elseif Controls.Level.Value ~= 0 then
-    Controls.Ref.Boolean = False
+  if Properties["Ref Mode"].Value == "Lock" then
+    if Controls.Ref.Boolean then
+      -- Force level to 0 when Ref is on
+      level_db = 0
+    end
+  else
+    -- Turn on Ref LED when level is 0
+    Controls.Ref.Boolean = (level_db == 0)
+    Send('&sledstate,7,' .. math.floor(Controls.Ref.Value))
   end
 
   Controls.Level.Value = level_db
@@ -473,13 +482,10 @@ Controls.SelectedSpeaker.EventHandler = RectifySpeakerSelector
 Controls.SelectedSource.EventHandler = RectifySourceSelector
 
 Controls.Ref.EventHandler = function(ctl)
-  if Properties["Ref Lock"].Value == "On" then
+  if Properties["Ref Mode"].Value == "Lock" then
     Controls.Level.IsDisabled = ctl.Boolean
   end
-  if ctl.Boolean then
-    Controls.Level.Value = 0
-    HandleLevelChange(0)
-  end
+  HandleLevelChange(0)
   Send('&sledstate,7,' .. math.floor(ctl.Value))
 end
 
