@@ -8,7 +8,7 @@ Each toggle button can be wired to other components such as gain, etc. Audio nev
 
 The plugin provides 12 Spkr and Src toggle buttons which can be wired to other components. These are divided into 4 layers on the hardware device.
 
-If the Ref Lock property is enabled, the Ref button locks the level at 0dB.
+The behavior of the Ref button has 2 different modes, set by the Ref Mode property. Lock means it acts as a toggle, and when on, the level cannot be adjusted. Trigger means that it triggers the level to 0, and the LED indicates when the level is 0.
 
 LED intensity can be controlled on the Setup page.
 
